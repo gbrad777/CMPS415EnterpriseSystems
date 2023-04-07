@@ -1,5 +1,24 @@
 {
   "dependencies": {
+    "body-parser": "^1.20.2",
     "express": "^4.18.2"
-  }
+  },
+  "scripts": {
+    "start": "node server.js",
+    "monitor": "nodemon server.js"
+  },
+  "name": "cmps415enterprisesystems",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbrad777/CMPS415EnterpriseSystems.git"
+  },
+  "author": "gbrad777",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gbrad777/CMPS415EnterpriseSystems/issues"
+  },
+  "homepage": "https://github.com/gbrad777/CMPS415EnterpriseSystems#readme",
+  "description": ""
 }
