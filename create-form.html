@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<div class="container">
+    <div class="form-container">
+        <h2>Enter Ticket Information:</h2>
+
+        <form action="/rest/ticket" method="post">
+            <div class="form-container">
+                <div>
+                    <h4>Id</h4>
+                    <input id="id" type="number" min="0" name="Id" required>
+                </div>
+                <div>
+                    <h4>Type</h4>
+
+                    <label for="type1">Error</label>
+                    <input id="type1" type="radio" value="Error" name="Type" required>
+
+                    <label for="type2">Repair</label>
+                    <input id="type2" type="radio" value="Repair" name="Type" required>
+
+                    <label for="type3">Incident</label>
+                    <input id="type3" type="radio" value="Incident" name="Type" required>
+                </div>
+                <div>
+                    <h4>Subject</h4>
+                    <input id="subject" type="text" name="Subject" required>
+                </div>
+                <div>
+                    <h4>Description</h4>
+                    <input id="description" type="text" name="Description" required>
+                </div>
+                <div>
+                    <h4>Priority</h4>
+
+                    <label for="priority1">High</label>
+                    <input id="priority1" type="radio" value="High" name="Priority" required>
+
+                    <label for="priority2">Medium</label>
+                    <input id="priority2" type="radio" value="Medium" name="Priority" required>
+
+                    <label for="priority3">Low</label>
+                    <input id="priority3" type="radio" value="Low" name="Priority" required>
+                </div>
+                <div>
+                    <h4>Status</h4>
+
+                    <label for="status1">Open</label>
+                    <input id="status1" type="radio" value="Open" name="Status" required>
+
+                    <label for="status2">Closed</label>
+                    <input id="status2" type="radio" value="Closed" name="Status" required>
+                </div>
+                <div>
+                    <h4>Recipient</h4>
+                    <input id="recipient" type="text" name="Recipient" required>
+                </div>
+                <div>
+                    <h4>Submitter</h4>
+                    <input id="submitter" type="text" name="Submitter" required>
+                </div>
+                <div>
+                    <h4>Assignee Id</h4>
+                    <input id="assigneeId" type="number" name="AssigneeId" required>
+                </div>
+                <div>
+                    <button type="submit">Submit</button>
+                </div>
+        </form>
+    </div>
+</div>
+
+</html>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 600px;
+        width: 350px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .first-input:checked+.hidden {
+        display: block;
+    }
+</style>
