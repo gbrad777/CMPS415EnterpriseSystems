@@ -5,11 +5,11 @@
     <div class="form-container">
         <h2>Enter Ticket Information:</h2>
 
-        <form id="update-ticket-form">
+        <form action="/rest/ticket/updateTicket" method="post">
             <div class="form-container">
                 <div>
                     <h4>Id</h4>
-                    <input id="id" type="number" min="0" name="Id" required>
+                    <input id="ticketId" type="number" min="0" name="TicketId" required>
                 </div>
                 <div>
                     <h4>Type</h4>
@@ -71,40 +71,6 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
-<script>
-    $(function () {
-        $('#update-ticket-form').on('submit', function (event) {
-            event.preventDefault();
-
-            const id = $('#id').val();
-            id = parseInt(id);
-            const formData = {
-                Id: id,
-                Type: $('input[name=Type]:checked').val(),
-                Subject: $('#subject').val(),
-                Description: $('description').val(),
-                Priority: $('input[name=Priority]:checked').val(),
-                Status: $('input[name=Status]:checked').val(),
-                Recipient: $('#recipient').val(),
-                Submitter: $('#submitter').val(),
-                AssigneeId: $('#assigneeId').val(),
-            };
-
-            var requestUrl = '/rest/ticket/' + id;
-
-            $.ajax({
-                url: requestUrl,
-                type: 'PUT',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
-                success: function (result) {
-                    console.log(result)
-                }
-            });
-        });
-    });
-</script>
 
 </html>
 

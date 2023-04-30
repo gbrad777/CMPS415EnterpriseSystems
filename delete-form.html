@@ -5,11 +5,11 @@
     <div class="form-container">
         <h2>Enter Ticket Id:</h2>
 
-        <form id="delete-ticket-form">
+        <form action="/rest/ticket/deleteTicket" method="post">
             <div class="form-container">
                 <div>
                     <h4>Id</h4>
-                    <input id="id" type="number" min="0" name="Id" required>
+                    <input id="ticketId" type="number" min="0" name="TicketId" required>
                 </div>
                 <div>
                     <button type="submit">Delete</button>
@@ -17,33 +17,6 @@
         </form>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
-<script>
-    $(function () {
-        $('#delete-ticket-form').on('submit', function (event) {
-            event.preventDefault();
-
-            var id = $('#id').val();
-            id = parseInt(id);
-            const formData = {
-                Id: id,
-            };
-
-            var requestUrl = '/rest/ticket/' + id;
-
-            $.ajax({
-                url: requestUrl,
-                type: 'DELETE',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
-                success: function (result) {
-                    console.log(result)
-                }
-            });
-        });
-    });
-</script>
 
 </html>
 

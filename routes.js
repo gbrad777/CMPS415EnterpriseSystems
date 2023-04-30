@@ -15,16 +15,16 @@ router.get("/list", function (req, res) {
 
             let allTickets = await tickets.find({}).toArray();
 
-            res.send(allTickets);
+            res.send(allTickets).status(200);
         } finally {
             await client.close();
         }
     }
 
-    run();
+    run().catch(console.dir);
 });
 
-router.get("/ticket/:Id", function (req, res) {
+router.get("/ticket/:TicketId", function (req, res) {
     const client = new MongoClient(uri);
 
     async function run() {
@@ -32,12 +32,11 @@ router.get("/ticket/:Id", function (req, res) {
             const database = client.db('CMPS415-TicketingSystem');
             const tickets = database.collection('HelpDeskTickets');
 
-            const query = { Id: parseInt(req.params.Id) };
+            const query = { TicketId: parseInt(req.params.TicketId) };
             const ticket = await tickets.findOne(query);
 
-            ticket ? res.send(JSON.stringify(ticket)) : res.json({ errorMessage: `ticket with id: ${parseInt(req.params.Id)} does not exist` });
+            ticket ? res.send(JSON.stringify(ticket)) : res.json({ errorMessage: `ticket with id: ${parseInt(req.params.TicketId)} does not exist` });
         } finally {
-
             await client.close();
         }
     }
@@ -61,7 +60,7 @@ router.post("/ticket", function (req, res) {
     const client = new MongoClient(uri);
 
     let data = req.body;
-    data.Id = parseInt(data.Id);
+    data.TicketId = parseInt(data.TicketId);
     data.AssigneeId = parseInt(data.AssigneeId);
 
     async function run() {
@@ -70,67 +69,81 @@ router.post("/ticket", function (req, res) {
             const tickets = database.collection('HelpDeskTickets');
 
             await tickets.insertOne(data);
+            res.send(data).status(201);
         } finally {
-
             await client.close();
         }
     }
 
-    run();
-    res.send(data).statusCode(201);
+    run().catch(console.dir);
 });
 
-router.put("/ticket/:Id", function (req, res) {
+router.post("/ticket/updateTicket", function (req, res) {
     const client = new MongoClient(uri);
 
     let data = req.body;
-    data.Id = parseInt(data.Id);
+    data.TicketId = parseInt(data.TicketId);
     data.AssigneeId = parseInt(data.AssigneeId);
 
     async function run() {
         try {
             const database = client.db('CMPS415-TicketingSystem');
             const tickets = database.collection('HelpDeskTickets');
-            var query = { Id: req.params.Id };
-            var updatedValues = {
-                $set: {
-                    Type: req.params.Type,
-                    Subject: req.params.Subject,
-                    Priority: req.params.Priority,
-                    Status: req.params.Status,
-                    Recipient: req.params.Recipient,
-                    Submitter: req.params.Submitter,
-                    AssigneeId: req.params.AssigneeId,
-                }
+
+            const updatedTicket = {
+                TicketId: req.body.TicketId,
+                Type: req.body.Type,
+                Subject: req.body.Subject,
+                Description: req.body.Description,
+                Priority: req.body.Priority,
+                Status: req.body.Status,
+                Recipient: req.body.Recipient,
+                Submitter: req.body.Submitter,
+                AssigneeId: req.body.AssigneeId,
             };
 
-            await tickets.updateOne(query, updatedValues);
+            const updateTicket = await tickets.findOneAndUpdate({ TicketId: req.body.TicketId }, { $set: updatedTicket });
+
+            if (!updateTicket) {
+                res.status(404).send("Ticket not found.");
+            } else {
+                res.send(updatedTicket).status(200);
+            }
         } finally {
             await client.close();
         }
     }
 
-    run();
+    run().catch(console.dir);
 });
 
-router.delete("/ticket/:Id", function (req, res) {
+router.post("/ticket/deleteTicket", function (req, res) {
     const client = new MongoClient(uri);
 
     let data = req.body;
-    data.Id = parseInt(data.Id);
+    data.TicketId = parseInt(data.TicketId);
 
     async function run() {
         try {
             const database = client.db('CMPS415-TicketingSystem');
             const tickets = database.collection('HelpDeskTickets');
 
-            await tickets.deleteOne({ Id: req.params.Id });
+            console.log(req.params.TicketId);
+
+            const deleteTicket = await tickets.findOneAndDelete({ TicketId: req.body.TicketId });
+
+            if (!deleteTicket) {
+                res.status(404).send("Ticket does not exist");
+            } else {
+                console.log(deleteTicket);
+                res.status(200).send("Ticket deleted!");
+            }
         } finally {
             await client.close();
         }
     }
 
-    run();
+    run().catch(console.dir);
 });
 
 module.exports = router;
