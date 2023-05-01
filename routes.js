@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 const { MongoClient } = require("mongodb");
+var js2xmlparser = require('js2xmlparser');
+const xmlparser = require('express-xml-bodyparser');
+
 
 const uri = "mongodb+srv://GBradford01:MwLs0Tqbe3hJiU2u@cmps415.5s9ks7f.mongodb.net/?retryWrites=true&w=majority";
 
@@ -36,6 +39,7 @@ router.get("/ticket/:TicketId", function (req, res) {
             const ticket = await tickets.findOne(query);
 
             ticket ? res.send(JSON.stringify(ticket)) : res.json({ errorMessage: `ticket with id: ${parseInt(req.params.TicketId)} does not exist` });
+            return ticket;
         } finally {
             await client.close();
         }
@@ -43,6 +47,31 @@ router.get("/ticket/:TicketId", function (req, res) {
 
     run().catch(console.dir);
 });
+
+router.get("/xml/ticket/:TicketId", function (req, res) {
+    const client = new MongoClient(uri);
+
+    async function run() {
+        try {
+            const database = client.db('CMPS415-TicketingSystem');
+            const tickets = database.collection('HelpDeskTickets');
+
+            const query = { TicketId: parseInt(req.params.TicketId) };
+            const ticket = await tickets.findOne(query);
+
+            var obj = adaptJsonToXml(ticket);
+
+            var xml = js2xmlparser.parse("Ticket", obj);
+            console.log(xml);
+
+            ticket ? res.contentType('application/xml').send(xml).status(200) : res.send({ errorMessage: `ticket with id: ${parseInt(req.params.TicketId)} does not exist` });
+        } finally {
+            await client.close();
+        }
+    }
+
+    run().catch(console.dir);
+})
 
 router.get("/create", function (req, res) {
     res.sendFile(__dirname + `/create-form.html`);
@@ -117,6 +146,36 @@ router.post("/ticket/updateTicket", function (req, res) {
     run().catch(console.dir);
 });
 
+router.put("/xml/ticket/:TicketId", xmlparser({ trim: false, explicitArray: false, normalizeTags: false, explicitRoot: true }), function (req, res) {
+    const client = new MongoClient(uri);
+
+    let xmlData = req.body;
+    console.log(xmlData);
+
+    var updatedTicket = adaptXmlToJson(xmlData);
+    console.log(updatedTicket);
+
+    async function run() {
+        try {
+            const database = client.db('CMPS415-TicketingSystem');
+            const tickets = database.collection('HelpDeskTickets');
+
+            const updateTicket = await tickets.findOneAndUpdate({ TicketId: updatedTicket.TicketId }, { $set: updatedTicket });
+
+            if (!updateTicket) {
+                res.status(404).send("Ticket not found.");
+            } else {
+                res.send(updateTicket).status(200);
+            }
+        } finally {
+            await client.close();
+        }
+    }
+
+    run().catch(console.dir);
+
+});
+
 router.post("/ticket/deleteTicket", function (req, res) {
     const client = new MongoClient(uri);
 
@@ -145,5 +204,33 @@ router.post("/ticket/deleteTicket", function (req, res) {
 
     run().catch(console.dir);
 });
+
+function adaptXmlToJson(body) {
+    return ticket = {
+        TicketId: parseInt(body.Ticket.TicketId),
+        Type: body.Ticket.Type,
+        Subject: body.Ticket.Subject,
+        Description: body.Ticket.Description,
+        Priority: body.Ticket.Priority,
+        Status: body.Ticket.Status,
+        Recipient: body.Ticket.Recipient,
+        Submitter: body.Ticket.Submitter,
+        AssigneeId: parseInt(body.Ticket.AssigneeId),
+    }
+};
+
+function adaptJsonToXml(json) {
+    return xmlTicket = {
+        TicketId: json.TicketId,
+        Type: json.Type,
+        Subject: json.Subject,
+        Description: json.Description,
+        Priority: json.Priority,
+        Status: json.Status,
+        Recipient: json.Recipient,
+        Submitter: json.Submitter,
+        AssigneeId: json.AssigneeId,
+    }
+};
 
 module.exports = router;
